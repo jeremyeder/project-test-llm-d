@@ -7,6 +7,8 @@ body:
     value: |
       Epics are reviewed monthly, not weekly. Use for initiatives spanning 4+ weeks.
       
+      **Auto-Labeling**: This template will automatically apply labels based on your selections below.
+      
   - type: textarea
     attributes:
       label: Epic Goal
@@ -39,16 +41,48 @@ body:
   - type: dropdown
     attributes:
       label: Target Milestone
+      description: "Target release milestone for this epic"
       options:
-        - v0.2 (Month 2)
-        - v0.3 (Month 3)
-        - v0.4 (Month 4)
+        - v0.2 (Hinton's Harmony)
+        - v0.3 (Unicorns and Bubblegum)
+        - v0.4 (TBD)
+        - v0.5 (TBD)
+        - v0.6 (TBD)
+        - v0.7 (TBD)
         - Future
     validations:
       required: true
       
-  - type: textarea
+  - type: dropdown
+    attributes:
+      label: Epic Type
+      description: "Determines if this is a core or extension epic"
+      options:
+        - Core Epic (affects core components)
+        - Extension Epic (affects extension components)
+        - Mixed Epic (affects both core and extensions)
+      default: 0
+    validations:
+      required: true
+      
+  - type: checkboxes
     attributes:
       label: Red Hat Impact
+      description: "Will auto-apply rh-priority label if checked"
+      options:
+        - label: This addresses a Red Hat customer requirement
+        - label: This affects Red Hat product roadmap
+        - label: Critical for OpenShift AI integration
+        
+  - type: checkboxes
+    attributes:
+      label: Demo Issue
+      description: "For testing and demonstrations only"
+      options:
+        - label: This is a demo/fake issue for testing the workflow
+        
+  - type: textarea
+    attributes:
+      label: Red Hat Impact Details
       description: How this affects commercial product
       placeholder: "Customer requirement for enterprise deployments"

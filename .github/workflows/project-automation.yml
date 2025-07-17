@@ -1,7 +1,7 @@
 name: Project Board Automation
 on:
   issues:
-    types: [opened, labeled, assigned]
+    types: [opened, labeled, assigned, milestoned]
   pull_request:
     types: [opened, closed]
 
@@ -19,5 +19,51 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'rh-priority')
         run: |
           gh issue edit ${{ github.event.issue.number }} --add-label "priority/high"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Set component type based on labels
+        if: github.event.action == 'opened' && github.event.issue
+        run: |
+          # Set Component Type field based on labels
+          if [[ "${{ join(github.event.issue.labels.*.name, ',') }}" == *"core-release"* ]]; then
+            echo "Issue has core-release label - would set Component Type to Core"
+            # Note: Setting custom fields via CLI requires GraphQL API
+          elif [[ "${{ join(github.event.issue.labels.*.name, ',') }}" == *"extension-release"* ]]; then
+            echo "Issue has extension-release label - would set Component Type to Extension"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Auto-assign to current milestone
+        if: github.event.action == 'opened' && github.event.issue && !github.event.issue.milestone
+        run: |
+          # Get current month's milestone (closest upcoming milestone)
+          CURRENT_MILESTONE=$(gh api repos/${{ github.repository }}/milestones \
+            --jq 'map(select(.state == "open")) | sort_by(.due_on) | .[0].title')
+          
+          if [ ! -z "$CURRENT_MILESTONE" ]; then
+            echo "Auto-assigning issue to milestone: $CURRENT_MILESTONE"
+            gh issue edit ${{ github.event.issue.number }} --milestone "$CURRENT_MILESTONE"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Move issues to This Month when milestone is near
+        if: github.event.action == 'milestoned' && github.event.issue
+        run: |
+          # Check if milestone due date is within 2 weeks
+          MILESTONE_DATE=$(gh api repos/${{ github.repository }}/milestones \
+            --jq '.[] | select(.title == "${{ github.event.issue.milestone.title }}") | .due_on')
+          
+          if [ ! -z "$MILESTONE_DATE" ]; then
+            # Calculate if due date is within 2 weeks (14 days)
+            DAYS_UNTIL_DUE=$(( ($(date -d "$MILESTONE_DATE" +%s) - $(date +%s)) / 86400 ))
+            
+            if [ $DAYS_UNTIL_DUE -le 14 ]; then
+              echo "Milestone due in $DAYS_UNTIL_DUE days - moving to This Month"
+              # Note: Moving items in Release Pipeline requires GraphQL API
+            fi
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

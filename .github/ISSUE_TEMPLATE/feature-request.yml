@@ -7,6 +7,8 @@ body:
     value: |
       Thanks for proposing a feature! Keep it simple and focused.
       
+      **Auto-Labeling**: This template will automatically apply labels based on your selections below.
+      
   - type: textarea
     attributes:
       label: What's the goal?
@@ -34,19 +36,40 @@ body:
   - type: dropdown
     attributes:
       label: Component
+      description: "Will auto-apply component/ label (e.g., component/scheduler)"
       options:
-        - scheduler
-        - kv-cache
-        - routing
-        - benchmark
-        - deployment
-        - docs
+        - scheduler (Core)
+        - kv-cache (Core)
+        - routing (Core)
+        - docs (Core)
+        - benchmark (Extension)
+        - deployment (Extension)
+    validations:
+      required: true
+      
+  - type: dropdown
+    attributes:
+      label: Priority
+      description: "Priority guidance: urgent=customer blocker, high=must have for monthly release, medium=should have, low=nice to have"
+      options:
+        - medium (default)
+        - high
+        - low
+      default: 0
     validations:
       required: true
       
   - type: checkboxes
     attributes:
       label: Red Hat Impact
+      description: "Will auto-apply rh-priority label if checked"
       options:
         - label: This addresses a Red Hat customer requirement
         - label: This affects Red Hat product roadmap
+        
+  - type: checkboxes
+    attributes:
+      label: Demo Issue
+      description: "For testing and demonstrations only"
+      options:
+        - label: This is a demo/fake issue for testing the workflow

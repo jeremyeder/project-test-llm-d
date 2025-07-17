@@ -3,6 +3,12 @@ description: Report a bug in llm-d
 title: "[BUG] "
 labels: ["type/bug", "priority/medium"]
 body:
+  - type: markdown
+    value: |
+      Report a bug to help us improve llm-d.
+      
+      **Auto-Labeling**: This template will automatically apply labels based on your selections below.
+      
   - type: textarea
     attributes:
       label: What happened?
@@ -43,11 +49,48 @@ body:
     validations:
       required: true
       
+  - type: dropdown
+    attributes:
+      label: Component
+      description: "Will auto-apply component/ label (e.g., component/scheduler)"
+      options:
+        - scheduler (Core)
+        - kv-cache (Core)
+        - routing (Core)
+        - docs (Core)
+        - benchmark (Extension)
+        - deployment (Extension)
+        - unknown
+      default: 6
+    validations:
+      required: true
+      
+  - type: dropdown
+    attributes:
+      label: Priority
+      description: "Priority guidance: urgent=customer blocker, high=must have for monthly release, medium=should have, low=nice to have"
+      options:
+        - medium (default)
+        - high
+        - urgent
+        - low
+      default: 0
+    validations:
+      required: true
+      
   - type: checkboxes
     attributes:
       label: Impact Assessment
+      description: "Will auto-apply rh-priority label if Red Hat customer impact is checked"
       options:
         - label: Blocks Red Hat customer deployment
         - label: Affects performance or reliability
         - label: Security implications
         - label: Reproducible in production
+        
+  - type: checkboxes
+    attributes:
+      label: Demo Issue
+      description: "For testing and demonstrations only"
+      options:
+        - label: This is a demo/fake issue for testing the workflow

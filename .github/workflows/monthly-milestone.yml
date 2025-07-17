@@ -1,0 +1,147 @@
+name: Monthly Milestone Management
+on:
+  schedule:
+    # Run on 1st of each month at 9 AM UTC
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to create (e.g., v0.8)'
+        required: false
+        type: string
+      month_name:
+        description: 'Month name (e.g., January)'
+        required: false
+        type: string
+      create_checklist:
+        description: 'Create release checklist'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  create-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Create monthly milestone
+        run: |
+          # Make script executable
+          chmod +x .github/scripts/create-monthly-milestone.sh
+          
+          # Set parameters
+          VERSION="${{ github.event.inputs.version }}"
+          MONTH_NAME="${{ github.event.inputs.month_name }}"
+          
+          # Run milestone creation script
+          if [ ! -z "$VERSION" ] && [ ! -z "$MONTH_NAME" ]; then
+            ./.github/scripts/create-monthly-milestone.sh "$VERSION" "$MONTH_NAME"
+          elif [ ! -z "$VERSION" ]; then
+            ./.github/scripts/create-monthly-milestone.sh "$VERSION"
+          else
+            ./.github/scripts/create-monthly-milestone.sh
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create release checklist
+        if: github.event.inputs.create_checklist != 'false'
+        run: |
+          # Make script executable
+          chmod +x .github/scripts/create-release-checklist.sh
+          
+          # Get the version that was just created
+          VERSION="${{ github.event.inputs.version }}"
+          
+          # If no version specified, get the latest milestone
+          if [ -z "$VERSION" ]; then
+            VERSION=$(gh api repos/${{ github.repository }}/milestones \
+              --jq 'map(select(.state == "open")) | sort_by(.due_on) | .[0].title')
+          fi
+          
+          # Create release checklist
+          if [ ! -z "$VERSION" ]; then
+            echo "Creating release checklist for $VERSION"
+            echo "y" | ./.github/scripts/create-release-checklist.sh "$VERSION"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Post summary
+        run: |
+          echo "## Monthly Milestone Created 🎯" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Created:" >> $GITHUB_STEP_SUMMARY
+          
+          # Get latest milestone info
+          LATEST_MILESTONE=$(gh api repos/${{ github.repository }}/milestones \
+            --jq 'map(select(.state == "open")) | sort_by(.due_on) | .[0]')
+          
+          MILESTONE_TITLE=$(echo "$LATEST_MILESTONE" | jq -r '.title')
+          MILESTONE_DUE=$(echo "$LATEST_MILESTONE" | jq -r '.due_on')
+          MILESTONE_DESC=$(echo "$LATEST_MILESTONE" | jq -r '.description')
+          
+          echo "- **Version**: $MILESTONE_TITLE" >> $GITHUB_STEP_SUMMARY
+          echo "- **Due Date**: $(date -d "$MILESTONE_DUE" '+%B %d, %Y')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Theme**: $MILESTONE_DESC" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. 🎨 Update release theme in milestone description" >> $GITHUB_STEP_SUMMARY
+          echo "2. 📋 Review and assign release checklist issue" >> $GITHUB_STEP_SUMMARY
+          echo "3. 🗓️  Add stories to the new milestone" >> $GITHUB_STEP_SUMMARY
+          echo "4. 📢 Announce to team in #sig-release channel" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  notify-team:
+    needs: create-milestone
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Create team notification issue
+        run: |
+          # Get the milestone info
+          LATEST_MILESTONE=$(gh api repos/${{ github.repository }}/milestones \
+            --jq 'map(select(.state == "open")) | sort_by(.due_on) | .[0]')
+          
+          MILESTONE_TITLE=$(echo "$LATEST_MILESTONE" | jq -r '.title')
+          MILESTONE_DUE=$(echo "$LATEST_MILESTONE" | jq -r '.due_on')
+          DUE_DATE_FORMATTED=$(date -d "$MILESTONE_DUE" '+%B %d, %Y')
+          
+          # Create notification issue
+          NOTIFICATION_BODY="## 📅 Monthly Milestone Created: $MILESTONE_TITLE
+
+### Release Information
+- **Version**: $MILESTONE_TITLE
+- **Due Date**: $DUE_DATE_FORMATTED
+- **Theme**: TBD (please update milestone description)
+
+### Action Items
+- [ ] **Release Lead**: Assign Release Lead to planning issue
+- [ ] **Product**: Update release theme in milestone description
+- [ ] **Engineering**: Review and add stories to $MILESTONE_TITLE
+- [ ] **Community**: Announce timeline in appropriate channels
+
+### Resources
+- [View Milestone](https://github.com/${{ github.repository }}/milestone/$(echo "$LATEST_MILESTONE" | jq -r '.number'))
+- [Project Board](https://github.com/users/jeremyeder/projects/6)
+- [Release Process Documentation](docs/monthly-planning-template.md)
+
+### Timeline
+- **Week 1**: Planning & Triage
+- **Week 2-3**: Development & Integration
+- **Week 4**: Release & Stabilization
+
+---
+🤖 **Auto-generated** by Monthly Milestone workflow on $(date '+%Y-%m-%d %H:%M:%S UTC')"
+
+          gh issue create \
+            --title "📅 Monthly Milestone Created: $MILESTONE_TITLE" \
+            --body "$NOTIFICATION_BODY" \
+            --milestone "$MILESTONE_TITLE" \
+            --label "type/task,priority/medium" \
+            --assignee "${{ github.actor }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
