@@ -126,7 +126,7 @@ flowchart TD
     end
     
     subgraph "llm-d (Monthly)"
-        L1[Epic Process] --> L2[Component Ownership]
+        L1[Epic Process] --> L2[SIG Ownership]
         L2 --> L3[Planning Week]
         L3 --> L4[Feature Freeze]
         L4 --> L5[Monthly Release]
@@ -165,10 +165,10 @@ flowchart TD
 |------------|---------------|-----------|------------|
 | **Release Cadence** | Quarterly (4 months) | Monthly | Predictable, time-based releases |
 | **Planning Process** | KEP (Kubernetes Enhancement Proposal) | Epic-driven development | Upfront design and coordination |
-| **Organization** | SIGs (Special Interest Groups) | Component-based labels | Clear ownership and expertise areas |
+| **Organization** | SIGs (Special Interest Groups) | SIGs + Component-based labels | Clear ownership and expertise areas |
 | **Milestone Tracking** | GitHub milestones with `/milestone` | Epic-milestone 1:1 relationship | Release-focused organization |
 | **Project Management** | GitHub Project Boards (2024 migration) | GitHub Project Boards | Transparent, GitHub-native workflow |
-| **Release Coordination** | Dedicated Release Team with roles | Release coordination issues | Structured, role-based execution |
+| **Release Coordination** | Dedicated Release Team with roles | Release coordination issues (building dedicated team) | Structured, role-based execution |
 | **Quality Gates** | Enhancement freeze + Code freeze | Feature freeze (Week 3) | Stability through controlled changes |
 | **Automation** | Custom tools, receipts process | GitHub Actions, automated scripts | Reduced manual overhead |
 | **Community** | Open participation, transparency | Community labels, open planning | Inclusive, collaborative development |
@@ -178,7 +178,8 @@ flowchart TD
 
 - **Monthly vs Quarterly**: Shorter cycles for faster feedback and delivery
 - **Epics vs KEPs**: Lightweight coordination without heavy design documents
-- **Component Labels vs SIGs**: Simpler organization suitable for smaller teams
+- **SIGs + Component Labels**: SIG ownership with granular component tracking
+- **Release Team Evolution**: Building dedicated release team while using coordination issues
 - **Automated Workflows**: More GitHub Actions integration for rapid iteration
 
 ### Familiar to Kubernetes Contributors
