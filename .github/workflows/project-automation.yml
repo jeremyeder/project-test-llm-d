@@ -1,0 +1,23 @@
+name: Project Board Automation
+on:
+  issues:
+    types: [opened, labeled, assigned]
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add to project
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: ${{ github.event.repository.html_url }}/projects/1
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Auto-prioritize Red Hat items
+        if: contains(github.event.issue.labels.*.name, 'rh-priority')
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --add-label "priority/high"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

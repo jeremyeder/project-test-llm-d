@@ -1,0 +1,54 @@
+name: Epic
+description: Large initiative spanning multiple stories
+title: "[EPIC] "
+labels: ["type/epic", "priority/high"]
+body:
+  - type: markdown
+    value: |
+      Epics are reviewed monthly, not weekly. Use for initiatives spanning 4+ weeks.
+      
+  - type: textarea
+    attributes:
+      label: Epic Goal
+      description: High-level capability this epic enables
+      placeholder: "Enable disaggregated serving for improved resource utilization"
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Success Criteria
+      description: Measurable outcomes
+      placeholder: |
+        - [ ] Prefill and decode run independently
+        - [ ] Performance improves by 20%
+        - [ ] Customer demo successful
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Stories in Epic
+      description: Link related issues (create them first)
+      placeholder: |
+        - [ ] #XX Design architecture
+        - [ ] #XX Implement prefill service
+        - [ ] #XX Implement decode service
+        - [ ] #XX Performance testing
+        
+  - type: dropdown
+    attributes:
+      label: Target Milestone
+      options:
+        - v0.2 (Month 2)
+        - v0.3 (Month 3)
+        - v0.4 (Month 4)
+        - Future
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Red Hat Impact
+      description: How this affects commercial product
+      placeholder: "Customer requirement for enterprise deployments"

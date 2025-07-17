@@ -1,0 +1,52 @@
+name: Feature Request
+description: Propose a new feature for llm-d
+title: "[FEATURE] "
+labels: ["type/story", "priority/medium"]
+body:
+  - type: markdown
+    value: |
+      Thanks for proposing a feature! Keep it simple and focused.
+      
+  - type: textarea
+    attributes:
+      label: What's the goal?
+      description: One sentence describing what users will be able to do
+      placeholder: "Enable X so that users can Y"
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Why now?
+      description: Context for prioritization
+      placeholder: "Customer need, technical debt, strategic importance"
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Success looks like
+      description: Clear acceptance criteria
+      placeholder: "- [ ] Users can do X\n- [ ] Performance improves by Y\n- [ ] Documentation updated"
+    validations:
+      required: true
+      
+  - type: dropdown
+    attributes:
+      label: Component
+      options:
+        - scheduler
+        - kv-cache
+        - routing
+        - benchmark
+        - deployment
+        - docs
+    validations:
+      required: true
+      
+  - type: checkboxes
+    attributes:
+      label: Red Hat Impact
+      options:
+        - label: This addresses a Red Hat customer requirement
+        - label: This affects Red Hat product roadmap

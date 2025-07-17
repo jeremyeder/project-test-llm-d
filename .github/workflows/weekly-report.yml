@@ -1,0 +1,34 @@
+name: Weekly Status Report
+on:
+  schedule:
+    - cron: '0 14 * * 1' # Monday 2PM UTC (9AM EST)
+  workflow_dispatch: # Manual trigger for testing
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate weekly status
+        run: |
+          echo "# Weekly Status Report - $(date +%Y-%m-%d)" > report.md
+          echo "" >> report.md
+          echo "## 🎯 This Month Progress" >> report.md
+          
+          # Get high priority open issues
+          gh issue list --label "priority/high,priority/urgent" --state open --json number,title,assignees \
+            --jq '.[] | "- **#\(.number)** \(.title) - @\(.assignees[0].login // "unassigned")"' >> report.md
+          
+          echo "" >> report.md
+          echo "## 📊 Quick Metrics" >> report.md
+          echo "- Open issues: $(gh issue list --state open --json number | jq length)" >> report.md
+          echo "- High priority: $(gh issue list --label 'priority/high' --state open --json number | jq length)" >> report.md
+          echo "- Red Hat priorities: $(gh issue list --label 'rh-priority' --state open --json number | jq length)" >> report.md
+          echo "- Blocked items: $(gh issue list --label 'blocked' --state open --json number | jq length)" >> report.md
+          
+          echo "" >> report.md
+          echo "---" >> report.md
+          echo "*Auto-generated every Monday*" >> report.md
+          
+          cat report.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
