@@ -1,10 +1,9 @@
 # project-test-llm-d
 
-This repository demonstrates a mature, lightweight project management workflow for the [llm-d project](https://github.com/llm-d/llm-d) with monthly releases, automated processes, and Red Hat ↔ Open Source integration.
+This repository demonstrates a mature, lightweight project management workflow for the [llm-d project](https://github.com/llm-d/llm-d) with monthly releases.
 
 ## 🎯 Purpose
 - Demonstrate GitHub Projects workflow for monthly releases
-- Show Red Hat ↔ Open Source integration patterns
 - Validate automated release processes
 - Test epic-milestone organizational structure
 
@@ -109,7 +108,7 @@ flowchart TD
 
 ## 🔄 Kubernetes-Inspired Workflow
 
-This workflow follows battle-tested patterns from Kubernetes, adapted for faster monthly releases while maintaining the quality and community-driven approach that makes Kubernetes successful.
+This workflow follows patterns from Kubernetes, adapted for faster monthly releases while maintaining the quality and community-driven approach that makes Kubernetes successful.
 
 ### Why Reference Kubernetes?
 The Kubernetes project has proven that structured, time-based releases with strong community collaboration can scale to massive projects. Our workflow adapts these proven patterns for faster iteration cycles.
@@ -233,7 +232,6 @@ flowchart TD
 ## 🏷️ Labels
 
 ### Priority
-- `priority/urgent` - Red Hat customer blocker
 - `priority/high` - Must have for monthly release
 - `priority/medium` - Should have 
 - `priority/low` - Nice to have
@@ -266,7 +264,6 @@ Customer requirements flow into the open source backlog via:
 1. Create GitHub issue with `rh-priority` label
 2. Community discussion on approach
 3. Implementation upstream-first
-4. Include in Red Hat product releases
 
 ## 📚 Resources & Documentation
 
